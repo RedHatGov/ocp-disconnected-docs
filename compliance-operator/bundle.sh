@@ -6,21 +6,19 @@ HOST_DIR='/host/'
 AUTH_TOKEN=$1
 AUTH_FILE='auth.json'
 
-unalias cp
-
 function __getContainers() {
   mkdir -p $BUNDLE_DIR/containers
   podman pull registry:2
   podman save registry:2 > $BUNDLE_DIR/containers/registry.tar
-  podman pull quay.io/redhatgov/operator-mirror:latest
-  podman save quay.io/redhatgov/operator-mirror:latest > $BUNDLE_DIR/containers/operator-mirror.tar
+  podman pull quay.io/redhatgov/compliance-disconnected:latest
+  podman save quay.io/redhatgov/compliance-disconnected:latest > $BUNDLE_DIR/containers/operator-mirror.tar
 }
 
-function __getAnsible() {
-  git clone -n https://github.com/mradecker/compliance-operator.git $BUNDLE_DIR/ansible \
-  && cd $BUNDLE_DIR/ansible \
-  && git checkout cd7b8dd10fd142b91af75910f8699969477f50c7 \
-  && cd -
+function __getManifests() {
+  mkdir -p $BUNDLE_DIR/manifests
+  curl https://raw.githubusercontent.com/openshift/compliance-operator/master/deploy/ns.yaml -o $BUNDLE_DIR/manifests/ns.yaml
+  curl https://raw.githubusercontent.com/openshift/compliance-operator/master/deploy/olm-catalog/operator-group.yaml -o $BUNDLE_DIR/manifests/og.yaml
+  curl https://raw.githubusercontent.com/openshift/compliance-operator/master/deploy/olm-catalog/subscription.yaml -o $BUNDLE_DIR/manifests/sub.yaml
 }
 
 
@@ -79,42 +77,28 @@ function __copyScripts() {
 }
 
 function bundle() {
-
-# Write Auth file
-__writeAuth ${AUTH_TOKEN}
-
-# Extract credentials
-read UN PASS < <(__extractCreds ${AUTH_TOKEN})
-
-# Podman login
-__podmanLogin $UN $PASS
-
-# Start the registry
-__startRegistry
-
-# Run the mirroring script
-__mirror $AUTH_FILE
-
-# Stop the registry
-__stopRegistry
-
-# Consolidate
-__consolidate
-
-# Get ansible
-
-__getAnsible
-
-# Get containers
-
-__getContainers
-
-# Compress
-tar -czvf ${BUNDLE_NAME} ${BUNDLE_DIR}
-
-# Export
-mv ${BUNDLE_NAME} ${HOST_DIR}
-
+  # Write Auth file
+  __writeAuth ${AUTH_TOKEN} && \
+  # Extract credentials
+  read UN PASS < <(__extractCreds ${AUTH_TOKEN}) && \
+  # Podman login
+  __podmanLogin $UN $PASS && \
+  # Start the registry
+  __startRegistry \
+  # Run the mirroring script
+  __mirror $AUTH_FILE \
+  # Stop the registry
+  __stopRegistry \
+  # Consolidate
+  __consolidate && \
+  # Get ansible
+  __getManifests && \
+  # Get containers
+  __getContainers && \
+  # Compress
+  tar -czvf ${BUNDLE_NAME} ${BUNDLE_DIR} && \
+  # Export
+  mv ${BUNDLE_NAME} ${HOST_DIR}
 }
 
 bundle

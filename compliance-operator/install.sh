@@ -50,12 +50,12 @@ function __buildDestination() {
 }
 
 function __upload() {
-for i in $(cat $MAPPING)
-do
-  SRC=$(__buildSource $i)
-  DST=$(__buildDestination $i)
-  skopeo copy docker://$SRC docker://$DST --tls-verify=false --all --authfile=$AUTH
-done
+  for i in $(cat $MAPPING)
+  do
+    SRC=$(__buildSource $i)
+    DST=$(__buildDestination $i)
+    skopeo copy docker://$SRC docker://$DST --tls-verify=false --all --authfile=$AUTH
+  done
 }
 
 __removeOH() {
@@ -71,11 +71,19 @@ __updateOperatorSource() {
 }
 
 __allowTags() {
-  ./fixRegConf.py
+  ./fixRegConf.py | oc apply -f -
 }
 
 __installOperator() {
-  ansible-playbook
+  oc apply -f bundle/manifests/
 }
 
-upload
+function main() {
+  __loadRegistry \
+  && __startRegistry \
+  && __upload \
+  && __removeOH \
+  && __updateOperatorSource \
+  && __allowTags \
+  && __installOperator
+}

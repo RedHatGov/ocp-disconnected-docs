@@ -50,13 +50,13 @@ RUN \
     && cd - \
     && rm -Rf Python-3.7.6 \
     && wget http://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.7.4/openshift-client-linux-4.7.4.tar.gz \
-    && tar xzvf openshift-client-linux-4.7.4.tar.gz \ 
+    && tar xzvf openshift-client-linux-4.7.4.tar.gz \
     && rm -f openshift-client-linux-4.7.4.tar.gz \
     && mv oc /usr/bin/ \
     && rm -f kubectl README.md \
     && dnf install -y skopeo \
     && dnf clean all
 
-COPY ./entrypoint.sh ./bundle.sh ./fixRegConf.py ./offline-operator-list ./upload.sh .install.sh ./install-container-launch.sh ./
+COPY ./entrypoint.sh ./bundle.sh ./offline-operator-list ./fixRegConf.py ./install.sh ./install-container-launch.sh ./
 
 ENTRYPOINT ["/entrypoint.sh"]
