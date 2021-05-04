@@ -1,18 +1,12 @@
 #!/bin/bash
 
-unalias cp
-
-while getopts a:b:d:m: flag
+while getopts a:d: flag
 do
     case "${flag}" in
         a) AUTH=${OPTARG};;
         # json formatted auth token for registry login
-        b) BUNDLE=${OPTARG};;
-        # Operator bundle tarball
         d) DEST=${OPTARG};;
         # URL of target registry to upload to. Sometimes requires port appended to end of url
-        m) MAPPING=${OPTARG};;
-        # Path to mapping.txt file that was created during bundle creation.
     esac
 done
 
@@ -32,7 +26,7 @@ function __loadRegistry() {
 
 function __stopRegistry() {
   podman container stop registry
-  podman containre rm registry
+  podman container rm registry
 }
 
 function __buildSource() {
@@ -50,11 +44,11 @@ function __buildDestination() {
 }
 
 function __upload() {
-  for i in $(cat $MAPPING)
+  for i in $(cat bundle/publish/mapping.txt)
   do
     SRC=$(__buildSource $i)
     DST=$(__buildDestination $i)
-    skopeo copy docker://$SRC docker://$DST --tls-verify=false --all --authfile=$AUTH
+    skopeo copy docker://$SRC docker://$DST --tls-verify=false --all --authfile=auth.json
   done
 }
 
@@ -78,12 +72,60 @@ __installOperator() {
   oc apply -f bundle/manifests/
 }
 
-function main() {
-  __loadRegistry \
-  && __startRegistry \
-  && __upload \
-  && __removeOH \
-  && __updateOperatorSource \
-  && __allowTags \
-  && __installOperator
+function __writeAuth() {
+  echo $1 > auth.json
 }
+
+function __runScan() {
+  cat << EOF |
+apiVersion: compliance.openshift.io/v1alpha1
+kind: ScanSetting
+metadata:
+  name: periodic-setting
+  namespace: openshift-compliance
+schedule: "0 1 * * *"
+rawResultStorage:
+    size: "2Gi"
+    rotation: 5
+roles:
+  - worker
+  - master
+---
+apiVersion: compliance.openshift.io/v1alpha1
+kind: ScanSettingBinding
+metadata:
+  name: periodic-cis
+  namespace: openshift-compliance
+profiles:
+  # Node checks
+  - name: ocp4-cis-node
+    kind: Profile
+    apiGroup: compliance.openshift.io/v1alpha1
+  # Platform checks
+  - name: ocp4-cis
+    kind: Profile
+    apiGroup: compliance.openshift.io/v1alpha1
+settingsRef:
+  name: periodic-setting
+  kind: ScanSetting
+  apiGroup: compliance.openshift.io/v1alpha1
+EOF
+oc apply -f -
+
+
+}
+
+function install() {
+  __writeAuth ${AUTH} && \
+  __loadRegistry && \
+  __startRegistry && \
+  __upload && \
+  __removeOH && \
+  __updateOperatorSource && \
+  __allowTags && \
+  __installOperator && \
+  __runScan
+}
+
+install
+
