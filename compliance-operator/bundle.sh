@@ -95,6 +95,8 @@ function bundle() {
   __getManifests && \
   # Get containers
   __getContainers && \
+  # Grab launch script
+  __copyScripts && \
   # Compress
   tar -czvf ${BUNDLE_NAME} ${BUNDLE_DIR} && \
   # Export
