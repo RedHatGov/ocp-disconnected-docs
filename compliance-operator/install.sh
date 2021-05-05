@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 while getopts a:d: flag
 do
@@ -59,7 +59,7 @@ __removeOH() {
 
 __updateOperatorSource() {
   sed -i "s/localhost/${DEST}/g" bundle/publish/olm-icsp.yaml
-  sed -i "s/localhost/${DEST}/g" rh-catalog-source.yaml
+  sed -i "s/localhost/${DEST}/g" bundle/publish/rh-catalog-source.yaml
   oc apply -f bundle/publish/olm-icsp.yaml
   oc apply -f bundle/publish/rh-catalog-source.yaml
 }
@@ -116,7 +116,7 @@ oc apply -f -
 }
 
 function install() {
-  __writeAuth ${AUTH} && \
+  __writeAuth "${AUTH}" && \
   __loadRegistry && \
   __startRegistry && \
   __upload && \

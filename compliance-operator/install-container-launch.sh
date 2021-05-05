@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 while getopts a:d: flag
 do
@@ -25,14 +25,14 @@ function __getAuth() {
   echo $(cat ${AUTH})
 }
 
-podman load < containers/operator-mirror.tar
+podman load < ${BUNDLE_ROOT}/containers/operator-mirror.tar
 
 podman run \
   -it --security-opt label=disable \
   -v /dev/fuse:/dev/fuse:rw \
-  --mount=type=bind,src=$BUNDLE_ROOT,dst=bundle \
+  --mount=type=bind,src=$BUNDLE_ROOT,dst=/bundle \
   --mount=type=bind,src=$KUBECONFIG,dst=/kubeconfig \
   -e KUBECONFIG=/kubeconfig \
   --rm --ulimit host --privileged \
-  quay.io/redhatgov/compliance-disconnected:latest ./install.sh -a ''"$(__getAuth)"'' -d ${DEST}
+  quay.io/redhatgov/compliance-disconnected:latest ./install.sh -a ''$(__getAuth)'' -d ${DEST}
 
