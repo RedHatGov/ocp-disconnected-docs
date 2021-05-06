@@ -25,6 +25,7 @@ function __getAuth() {
   echo $(cat ${AUTH})
 }
 
+podman image rm quay.io/redhatgov/compliance-disconnected:latest
 podman load < ${BUNDLE_ROOT}/containers/operator-mirror.tar
 
 podman run \
@@ -34,5 +35,5 @@ podman run \
   --mount=type=bind,src=$KUBECONFIG,dst=/kubeconfig \
   -e KUBECONFIG=/kubeconfig \
   --rm --ulimit host --privileged \
-  quay.io/redhatgov/compliance-disconnected:latest ./install.sh -a ''$(__getAuth)'' -d ${DEST}
+  quay.io/redhatgov/compliance-disconnected:latest ./install.sh -a "$(__getAuth)" -d ${DEST}
 
