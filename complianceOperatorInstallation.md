@@ -2,12 +2,16 @@
 
 ## Overview
 
-This guide is intended to demonstrate how to install the OpenShift [Compliance Operator](https://github.com/ComplianceAsCode/content) into disconnected OpenShift environments.
+This guide is intended to demonstrate how to install the OpenShift [Compliance Operator](https://github.com/openshift/compliance-operator) into disconnected OpenShift environments.
 
 The process of installing the OpenShift Compliance Operator can be broke down into three major steps:
 1. Bundling (Internet Connected)
 2. Mirroring (Disconnected)
 3. Installation (Disconnected)
+
+## Prereq
+
+1. podman on the disconnected and internet connected hosts.
 
 ## Bundling
 
@@ -22,10 +26,24 @@ git clone https://github.com/RedHatGov/openshift-disconnected-operators.git
 3. Run Compliance Operator convenience bundler:
 ```
 cd openshift-disconnected-operators
-./container/container-launch.sh ./bundle.sh '<< Pull Secret>>'
+./container/bundle-container-launch.sh ./bundle.sh '<< Pull Secret>>'
 ```
 *Note, ensure pull secret is entered between literals.
-*Note, This process bundles the latest version of operators. Refer to the openshift-disconnected-operators' README for advanced usage.
+*Note, This process bundles the latest version of operators. Refer to the [openshift-disconnected-operators'](https://github.com/redhat-cop/openshift-disconnected-operators) README for advanced usage.
 
+4. After the previous command is finished,  `compliance-bundle.tar.gz` will be output to your current directory. Move this bundle to the disconnected host.
+
+5. From the disconnected host, extract the bundle and descend into it:  
+```
+tar xzvf compliance-bundle.tar.gz
+cd bundle
+```
+
+6. Mirror, Install, and use the compliance operator to scan the target Openshift cluster:
+Note: Substitute the values of the -a and -d flags in the following command.
+
+```
+./bundle/scripts/install-container-launch.sh ./install.sh -a << path to json auth file >> -d << mirror.registry.name:port >>
+```
 
 
