@@ -58,8 +58,8 @@ __removeOH() {
 }
 
 __updateOperatorSource() {
-  sed -i "s/localhost/${DEST}/g" bundle/publish/olm-icsp.yaml
-  sed -i "s/localhost/${DEST}/g" bundle/publish/rh-catalog-source.yaml
+  sed -i "s/localhost\:5000/${DEST}/g" bundle/publish/olm-icsp.yaml
+  sed -i "s/localhost\:5000/${DEST}/g" bundle/publish/rh-catalog-source.yaml
   oc apply -f bundle/publish/olm-icsp.yaml
   oc apply -f bundle/publish/rh-catalog-source.yaml
 }
@@ -112,6 +112,15 @@ settingsRef:
 EOF
 oc apply -f -
 
+}
+
+function crdCheck() {
+
+  until oc get crd | grep compliance
+  do
+    echo "Waiting for Compliance Operator Installation"
+    sleep 5
+  done
 
 }
 
@@ -124,6 +133,7 @@ function install() {
   __updateOperatorSource && \
   __allowTags && \
   __installOperator && \
+  __crdCheck && \
   __runScan
 }
 

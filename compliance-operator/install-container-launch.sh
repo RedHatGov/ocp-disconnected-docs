@@ -25,15 +25,26 @@ function __getAuth() {
   echo $(cat ${AUTH})
 }
 
-podman image rm quay.io/redhatgov/compliance-disconnected:latest
-podman load < ${BUNDLE_ROOT}/containers/operator-mirror.tar
 
-podman run \
-  -it --security-opt label=disable \
-  -v /dev/fuse:/dev/fuse:rw \
-  --mount=type=bind,src=$BUNDLE_ROOT,dst=/bundle \
-  --mount=type=bind,src=$KUBECONFIG,dst=/kubeconfig \
-  -e KUBECONFIG=/kubeconfig \
-  --rm --ulimit host --privileged \
-  quay.io/redhatgov/compliance-disconnected:latest ./install.sh -a "$(__getAuth)" -d ${DEST}
+function install() {
 
+  if [ -z ${AUTH} ] && [ -z ${DEST} ]
+  then
+    podman image rm quay.io/redhatgov/compliance-disconnected:latest
+    podman load < ${BUNDLE_ROOT}/containers/operator-mirror.tar
+    podman run \
+      -it --security-opt label=disable \
+      -v /dev/fuse:/dev/fuse:rw \
+      --mount=type=bind,src=$BUNDLE_ROOT,dst=/bundle \
+      --mount=type=bind,src=$KUBECONFIG,dst=/kubeconfig \
+      -e KUBECONFIG=/kubeconfig \
+      --rm --ulimit host --privileged \
+      quay.io/redhatgov/compliance-disconnected:latest ./install.sh -a "$(__getAuth)" -d ${DEST}
+  else
+    echo -e "\n -a or -d flags not declared. Exiting\n"
+    break
+  fi
+
+}
+
+install
