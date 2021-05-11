@@ -43,7 +43,7 @@ cd bundle
 Note: Substitute the values of the -a and -d flags in the following command.
 
 ```
-./bundle/scripts/install-container-launch.sh ./install.sh -a << path to json auth file >> -d << mirror.registry.name:port >>
+./bundle/scripts/install-container-launch.sh -a << path to json auth file >> -d << mirror.registry.name:port >>
 ```
 
 

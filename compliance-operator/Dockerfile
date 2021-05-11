@@ -55,6 +55,7 @@ RUN \
     && mv oc /usr/bin/ \
     && rm -f kubectl README.md \
     && dnf install -y skopeo \
+    && sed -i 's/k8s\_file/journald/' /etc/containers/containers.conf \
     && dnf clean all
 
 COPY ./entrypoint.sh ./bundle.sh ./offline-operator-list ./fixRegConf.py ./install.sh ./install-container-launch.sh ./

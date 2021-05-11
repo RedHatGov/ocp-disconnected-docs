@@ -28,7 +28,7 @@ function __getAuth() {
 
 function install() {
 
-  if [ -z ${AUTH} ] && [ -z ${DEST} ]
+  if [ ! -z ${AUTH} -a ! -z ${DEST} ]
   then
     podman image rm quay.io/redhatgov/compliance-disconnected:latest
     podman load < ${BUNDLE_ROOT}/containers/operator-mirror.tar
