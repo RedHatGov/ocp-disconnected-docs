@@ -35,7 +35,7 @@ RUN \
         wget \
         which \
         ansible \
-    && wget https://raw.githubusercontent.com/arvin-a/openshift-disconnected-operators/cf34b896e44b861c7111dc92f979aad7663f951b/mirror-operator-catalogue.py \
+    && wget https://raw.githubusercontent.com/redhat-cop/openshift-disconnected-operators/d546d3b64e811c8fd24c70154da14a4e07f27a79/mirror-operator-catalogue.py \
     && chmod +x mirror-operator-catalogue.py \
     && wget https://raw.githubusercontent.com/arvin-a/openshift-disconnected-operators/master/known-bad-images \
     && wget https://raw.githubusercontent.com/arvin-a/openshift-disconnected-operators/master/image-content-source-template \
@@ -55,7 +55,7 @@ RUN \
     && mv oc /usr/bin/ \
     && rm -f kubectl README.md \
     && dnf install -y skopeo \
-    && sed -i 's/k8s\_file/journald/' /etc/containers/containers.conf \
+    && sed -i 's/k8s\_file/k8s\-file/' /etc/containers/containers.conf \
     && dnf clean all
 
 COPY ./entrypoint.sh ./bundle.sh ./offline-operator-list ./fixRegConf.py ./install.sh ./install-container-launch.sh ./

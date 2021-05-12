@@ -42,7 +42,7 @@ function install() {
       quay.io/redhatgov/compliance-disconnected:latest ./install.sh -a "$(__getAuth)" -d ${DEST}
   else
     echo -e "\n -a or -d flags not declared. Exiting\n"
-    break
+    exit 1
   fi
 
 }

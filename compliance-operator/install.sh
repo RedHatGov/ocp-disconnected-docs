@@ -34,7 +34,12 @@ function __buildSource() {
   SOURCE=$(grep -oP '(?<=\=).*' <<< $1)
   # Second grab the digest of the image
   DIGEST=$(grep -oP '\@.*(?=\=)' <<< $1)
-  echo "$SOURCE$DIGEST"
+  if [ ! -z ${DIGEST} ]
+  then
+    echo "$SOURCE$DIGEST"
+  else
+    echo "$SOURCE"
+  fi
 }
 
 function __buildDestination() {
@@ -50,6 +55,7 @@ function __upload() {
     DST=$(__buildDestination $i)
     skopeo copy docker://$SRC docker://$DST --tls-verify=false --all --authfile=auth.json
   done
+  skopeo copy docker://localhost:5000/custom-redhat-operator-index:1.0.0 docker://${DEST}/custom-redhat-operator-index:1.0.0 --tls-verify=false --all --authfile=auth.json
 }
 
 __removeOH() {
@@ -114,7 +120,7 @@ oc apply -f -
 
 }
 
-function crdCheck() {
+function __crdCheck() {
 
   until oc get crd | grep compliance
   do
