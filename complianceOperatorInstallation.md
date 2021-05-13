@@ -19,13 +19,14 @@ Perform the following steps on an internet connected host.
 
 1. Clone the (unofficial) OpenShift Operator mirroring utility:  
 ```
-git clone https://github.com/RedHatGov/openshift-disconnected-operators.git
+git clone https://github.com/RedHatGov/ocp-disconnected-docs.git
+cd ocp-disconnected-docs/
+git checkout -t origin/compliance-operator
 ```
-2. Retrieve OpenShift Pull Secret from: https://cloud.redhat.com/openshift/install/aws/installer-provisioned
+2. Retrieve OpenShift Pull Secret from: https://cloud.redhat.com/openshift/install/pull-secret
 
 3. Run Compliance Operator convenience bundler:
 ```
-cd openshift-disconnected-operators
 ./container/bundle-container-launch.sh ./bundle.sh '<< Pull Secret>>'
 ```
 *Note, ensure pull secret is entered between literals.
