@@ -75,7 +75,35 @@ __allowTags() {
 }
 
 __installOperator() {
-  oc apply -f bundle/manifests/
+  cat << EOF |
+apiVersion: v1
+kind: Namespace
+metadata:
+      name: openshift-compliance
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: compliance-operator
+  namespace: openshift-compliance
+spec:
+  targetNamespaces:
+  - openshift-compliance
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: compliance-operator-sub
+  namespace: openshift-compliance
+spec:
+  channel: "4.7"
+  name: compliance-operator
+  source: custom-redhat-operators
+  installPlanApproval: automatic
+  sourceNamespace: openshift-marketplace
+EOF
+oc apply -f -
+
 }
 
 function __writeAuth() {
@@ -129,6 +157,7 @@ function __crdCheck() {
   done
 
 }
+
 
 function install() {
   __writeAuth "${AUTH}" && \

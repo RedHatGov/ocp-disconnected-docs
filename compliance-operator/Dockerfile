@@ -58,6 +58,6 @@ RUN \
     && sed -i 's/k8s\_file/k8s\-file/' /etc/containers/containers.conf \
     && dnf clean all
 
-COPY ./entrypoint.sh ./bundle.sh ./offline-operator-list ./fixRegConf.py ./install.sh ./install-container-launch.sh ./
+COPY ./entrypoint.sh ./bundle.sh ./offline-operator-list ./fixRegConf.py ./install.sh ./install-container-launch.sh ./results-container-launch.sh ./results.sh ./
 
 ENTRYPOINT ["/entrypoint.sh"]

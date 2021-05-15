@@ -12,6 +12,8 @@ function __getContainers() {
   podman save registry:2 > $BUNDLE_DIR/containers/registry.tar
   podman pull quay.io/redhatgov/compliance-disconnected:latest
   podman save quay.io/redhatgov/compliance-disconnected:latest > $BUNDLE_DIR/containers/operator-mirror.tar
+  podman pull registry.access.redhat.com/ubi8/ubi:latest 
+  podman save registry.access.redhat.com/ubi8/ubi:latest > $BUNDLE_DIR/containers/ubi8.tar
 }
 
 function __getManifests() {
@@ -68,12 +70,15 @@ function __mirror() {
     --registry-olm localhost:5000 \
     --registry-catalog localhost:5000 \
     --operator-file ./offline-operator-list \
+    --ocp-version 4.7 \
+    --operator-channel 4.7 \
     --icsp-scope=namespace
 }
 
 function __copyScripts() {
   mkdir -p $BUNDLE_DIR/scripts
   cp install-container-launch.sh $BUNDLE_DIR/scripts/
+  cp results-container-launch.sh $BUNDLE_DIR/scripts/
 }
 
 function bundle() {
@@ -92,7 +97,7 @@ function bundle() {
   # Consolidate
   __consolidate && \
   # Get ansible
-  __getManifests && \
+  #__getManifests && \
   # Get containers
   __getContainers && \
   # Grab launch script
