@@ -32,6 +32,7 @@ apiVersion: "v1"
 kind: Pod
 metadata:
   name: pv-extract
+  namespace: openshift-compliance
 spec:
   containers:
     - name: pv-extract-pod
@@ -53,13 +54,14 @@ EOF
       sleep 5
     done 
 
-    oc cp pv-extract:/scan-results ./workdir/scan_results
+    oc cp -n openshift-compliance pv-extract:/scan-results ./workdir/scan_results
 
     cat << EOF |
 apiVersion: "v1"
 kind: Pod
 metadata:
   name: pv-extract
+  namespace: openshift-compliance
 spec:
   containers:
     - name: pv-extract-pod
