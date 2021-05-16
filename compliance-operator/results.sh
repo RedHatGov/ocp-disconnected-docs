@@ -12,14 +12,14 @@ done
 
 function __getScanName() {
 
-  oc get compliancescans -o json | jq '.items[].status.resultsStorage' | jq -r '.name'
+  oc get compliancescans -n openshift-compliance -o json | jq -r '.items[].status.resultsStorage.name'
 
 }
 
 function __getPVC() {
   for i in $1
   do
-    oc get pvc $i -o json | jq -r '.metadata.name'
+    oc get -n openshift-compliance pvc $i -o json | jq -r '.metadata.name'
   done
 }
 
@@ -47,7 +47,7 @@ spec:
 EOF
     oc apply -f -
 
-    until oc get pod pv-extract -o json | jq -r '.status.containerStatuses[].state' | grep running
+    until oc get pod -n openshift-compliance pv-extract -o json | jq -r '.status.containerStatuses[].state' | grep running
     do 
       echo "Starting Results Extraction Pod"
       sleep 5
@@ -74,7 +74,7 @@ spec:
         claimName: ${i}
 EOF
     oc delete -f -
-    until ! oc get pod -o json | jq '.items[].metadata.name' | grep pv-extract
+    until ! oc get pod -n openshift-compliance -o json | jq '.items[].metadata.name' | grep pv-extract
     do 
       echo "Deleting Results Extraction Pod"
       sleep 5
@@ -95,8 +95,13 @@ function __getDigest() {
 
 }
 
-function results() {
+function __writeAuth() {
+  echo $1 > auth.json
+}
 
+function results() {
+  
+  __writeAuth "${AUTH}" && \
   name=$(__getScanName) && \
   pvc=$(__getPVC "${name}") && \
   __loadUBI && \

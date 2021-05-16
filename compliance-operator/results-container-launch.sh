@@ -37,7 +37,7 @@ function install() {
       -v /dev/fuse:/dev/fuse:rw \
       --mount=type=bind,src=$BUNDLE_ROOT,dst=/bundle \
       --mount=type=bind,src=$KUBECONFIG,dst=/kubeconfig \
-      --mount=type=bind,src=${PWD},dst=/workdir
+      --mount=type=bind,src=${PWD},dst=/workdir \
       -e KUBECONFIG=/kubeconfig \
       --rm --ulimit host --privileged \
       quay.io/redhatgov/compliance-disconnected:latest ./results.sh -a "$(__getAuth)" -d ${DEST}
