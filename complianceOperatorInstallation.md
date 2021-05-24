@@ -12,6 +12,8 @@ The process of installing the OpenShift Compliance Operator can be broke down in
 ## Prereq
 
 1. podman on the disconnected and internet connected hosts.
+2. Openshift Config namespace has Pull Secret for disconnected registry set. [Configuring Global Pull Secret'](https://docs.openshift.com/container-platform/4.7/openshift_images/managing_images/using-image-pull-secrets.html#images-update-global-pull-secret_using-image-pull-secrets)
+3. Export KUBECONFIG environment variable on disconnected host
 
 ## Bundling
 
@@ -27,7 +29,7 @@ git checkout -t origin/compliance-operator
 
 3. Run Compliance Operator convenience bundler:
 ```
-./container/bundle-container-launch.sh ./bundle.sh '<< Pull Secret>>'
+./compliance-operator/bundle-container-launch.sh ./bundle.sh '<< Pull Secret>>'
 ```
 *Note, ensure pull secret is entered between literals.
 *Note, This process bundles the latest version of operators. Refer to the [openshift-disconnected-operators'](https://github.com/redhat-cop/openshift-disconnected-operators) README for advanced usage.
@@ -64,3 +66,11 @@ Note: The above command will download the scan results and place them into the `
 tree ./scan_results
 ```
 Note: Each numbered directory under `scan_results` represents the times the scan was run. If only one scan has been run, then only the `0` directory will be populated.
+
+## Conclusion
+
+After following these steps, you should now have the compliance operator successfully deployed to your OpenShift cluster in a disconnected network. You will also have the results of the initial scans. In some instances the compliance operator will create compliance remediations that may be applied to address some findings. For more information on using the compliance operator and performing remediations refer to the following articles and documentation:
+
+* https://github.com/openshift/compliance-operator/blob/master/doc/remediation-flow.md
+* https://www.openshift.com/blog/how-does-compliance-operator-work-for-openshift-part-1
+* https://www.openshift.com/blog/how-does-compliance-operator-work-for-openshift-part-2
