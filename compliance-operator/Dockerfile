@@ -37,9 +37,9 @@ RUN \
         ansible \
     && wget https://raw.githubusercontent.com/redhat-cop/openshift-disconnected-operators/d546d3b64e811c8fd24c70154da14a4e07f27a79/mirror-operator-catalogue.py \
     && chmod +x mirror-operator-catalogue.py \
-    && wget https://raw.githubusercontent.com/arvin-a/openshift-disconnected-operators/master/known-bad-images \
-    && wget https://raw.githubusercontent.com/arvin-a/openshift-disconnected-operators/master/image-content-source-template \
-    && wget https://raw.githubusercontent.com/arvin-a/openshift-disconnected-operators/master/catalog-source-template \
+    && wget https://raw.githubusercontent.com/redhat-cop/openshift-disconnected-operators/d546d3b64e811c8fd24c70154da14a4e07f27a79/known-bad-images \
+    && wget https://raw.githubusercontent.com/redhat-cop/openshift-disconnected-operators/d546d3b64e811c8fd24c70154da14a4e07f27a79/image-content-source-template \
+    && wget https://raw.githubusercontent.com/redhat-cop/openshift-disconnected-operators/d546d3b64e811c8fd24c70154da14a4e07f27a79/catalog-source-template \
     && wget https://www.python.org/ftp/python/3.7.6/Python-3.7.6.tgz \
     && tar xzvf Python-3.7.6.tgz \
     && rm -f Python-3.7.6.tgz \
